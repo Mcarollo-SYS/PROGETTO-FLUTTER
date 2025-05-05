@@ -1,0 +1,28 @@
+{
+    // Usare IntelliSense per informazioni sui possibili attributi.
+    // Al passaggio del mouse vengono visualizzate le descrizioni degli attributi esistenti.
+    // Per altre informazioni, visitare: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "flutter_project",
+            "cwd": "flutter_project",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "flutter_project (profile mode)",
+            "cwd": "flutter_project",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "flutter_project (release mode)",
+            "cwd": "flutter_project",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

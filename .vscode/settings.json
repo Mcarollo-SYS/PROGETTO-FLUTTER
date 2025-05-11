@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/Users/matteocarollo/Documents/GitHub/PROGETTO-FLUTTER/flutter_project/windows"
+    "cmake.sourceDirectory": "/Users/matteocarollo/Documents/GitHub/PROGETTO-FLUTTER/flutter_project/windows",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/SCREENS/home_screen.dart';
+import 'package:flutter_project/SCREENS/main_navigation_screen.dart';
+import 'package:flutter_project/SCREENS/stats_screen.dart';
+import 'package:flutter_project/SCREENS/add_screen.dart';
+import 'package:flutter_project/SCREENS/profile_screen.dart';
 
-void main() {
-  runApp(const MainApp());
-}
+void main() => runApp(NoteSpeseApp());
 
-//ci sarà l'app
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
+class NoteSpeseApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'NoteSpese',
+      theme: ThemeData(primarySwatch: Colors.teal),
+      home: MainNavigationScreen(),
     );
   }
 }

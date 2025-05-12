@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 class AddScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
+  AddScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,8 +26,8 @@ class AddScreen extends StatelessWidget {
               ),
               DropdownButtonFormField(
                 items: [
-                  DropdownMenuItem(child: Text('Entrata'), value: 'entrata'),
-                  DropdownMenuItem(child: Text('Uscita'), value: 'uscita'),
+                  DropdownMenuItem(value: 'entrata', child: Text('Entrata')),
+                  DropdownMenuItem(value: 'uscita', child: Text('Uscita')),
                 ],
                 onChanged: (val) {},
                 decoration: InputDecoration(labelText: 'Tipo'),

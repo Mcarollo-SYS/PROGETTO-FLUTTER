@@ -6,6 +6,8 @@ import 'add_screen.dart';
 import 'profile_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
+  const MainNavigationScreen({super.key});
+
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
@@ -40,13 +42,13 @@ Widget build(BuildContext context) {
     extendBody: true, // Per far “galleggiare” la navigation bar
     body: _screens[_currentIndex],
     bottomNavigationBar: Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
+            color: const Color.fromARGB(22, 39, 16, 209),
             blurRadius: 10,
             offset: Offset(0, 4),
           ),

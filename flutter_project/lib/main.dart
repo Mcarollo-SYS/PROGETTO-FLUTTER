@@ -1,9 +1,6 @@
+// lib/main.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_project/SCREENS/home_screen.dart';
-import 'package:flutter_project/SCREENS/main_navigation_screen.dart';
-import 'package:flutter_project/SCREENS/stats_screen.dart';
-import 'package:flutter_project/SCREENS/add_screen.dart';
-import 'package:flutter_project/SCREENS/profile_screen.dart';
+import 'SCREENS/main_navigation_screen.dart';
 
 void main() => runApp(NoteSpeseApp());
 
@@ -13,7 +10,10 @@ class NoteSpeseApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'NoteSpese',
-      theme: ThemeData(primarySwatch: Colors.teal),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+        useMaterial3: true,
+      ),
       home: MainNavigationScreen(),
     );
   }

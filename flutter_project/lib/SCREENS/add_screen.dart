@@ -123,7 +123,7 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7F8FA),
+        color: const Color.fromARGB(255, 255, 255, 255),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE0E0E0)),
       ),
@@ -149,7 +149,7 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7F8FA),
+        color: const Color.fromARGB(255, 255, 255, 255),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE0E0E0)),
       ),
@@ -177,7 +177,7 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
           });
         },
         borderColor: Colors.transparent,
-        selectedColor: Colors.white,
+        selectedColor: const Color.fromARGB(255, 96, 96, 96),
         unselectedColor: const Color(0xFFF7F8FA),
         pressedColor: Colors.grey[300],
       ),

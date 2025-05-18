@@ -3,12 +3,16 @@ description: "A new Flutter project."
 publish_to: 'none'
 version: 0.1.0
 
+
+
 environment:
   sdk: ^3.7.2
 
 dependencies:
   flutter:
     sdk: flutter
+  http: ^1.2.1  # o l'ultima versione disponibile
+
 
 dev_dependencies:
   flutter_test:

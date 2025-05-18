@@ -3,6 +3,7 @@ CREATE TABLE utenti (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
+    telefono INT NOT NULL,
     password_hash VARCHAR(255) NOT NULL
 );
 
@@ -21,7 +22,7 @@ CREATE TABLE transazioni (
     utente_id INT NOT NULL,
     categoria_id INT NOT NULL,
     importo DECIMAL(10,2) NOT NULL,
-    tipo ENUM('entrata', 'uscita') NOT NULL,
+    tipo ENUM('Entrata', 'Uscita') NOT NULL,
     descrizione TEXT,
     data DATE NOT NULL,
     FOREIGN KEY (utente_id) REFERENCES utenti(id) ON DELETE CASCADE,

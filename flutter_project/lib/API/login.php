@@ -1,42 +1,23 @@
 <?php
-$host = 'localhost';
-$db = 'nome_db';      
-$user = 'root';       
-$pass = '';           
+header("Content-Type: application/json");
+include "db.php"; // file con connessione al database
 
-$conn = new mysqli($host, $user, $pass, $db);
+$data = json_decode(file_get_contents("php://input"));
 
-if ($conn->connect_error) {
-    die(json_encode(['success' => false, 'message' => 'Errore di connessione']));
-}
+$email = $data->email;
+$password = $data->password;
 
-// Ottieni parametri da GET
-$email = $_GET['email'] ?? '';
-$password = $_GET['password'] ?? '';
-
-if (empty($email) || empty($password)) {
-    echo json_encode(['success' => false, 'message' => 'Email o password mancanti']);
-    exit;
-}
-
-// Query per trovare l’utente
-$stmt = $conn->prepare("SELECT id FROM utenti WHERE email = ? AND password = ?");
+$sql = "SELECT * FROM utenti WHERE email = ? AND password = ?";
+$stmt = $conn->prepare($sql);
 $stmt->bind_param("ss", $email, $password);
 $stmt->execute();
 $result = $stmt->get_result();
 
-if ($row = $result->fetch_assoc()) {
-    echo json_encode([
-        'success' => true,
-        'utente_id' => $row['id']
-    ]);
+if ($result->num_rows > 0) {
+  echo json_encode(["success" => true, "message" => "Login ok"]);
 } else {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Credenziali non valide'
-    ]);
+  echo json_encode(["success" => false, "message" => "Credenziali errate"]);
 }
 
-$stmt->close();
 $conn->close();
 ?>

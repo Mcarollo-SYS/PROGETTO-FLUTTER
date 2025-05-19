@@ -1,8 +1,8 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
+import 'SCREENS/login_screen.dart';
 import 'SCREENS/main_navigation_screen.dart';
 
-void main() => runApp(NoteSpeseApp());
+void main() => runApp(const NoteSpeseApp());
 
 class NoteSpeseApp extends StatelessWidget {
   const NoteSpeseApp({super.key});
@@ -13,10 +13,14 @@ class NoteSpeseApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'NoteSpese',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 164, 237, 9)),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: MainNavigationScreen(),
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/home': (context) => const MainNavigationScreen(),
+      },
     );
   }
 }

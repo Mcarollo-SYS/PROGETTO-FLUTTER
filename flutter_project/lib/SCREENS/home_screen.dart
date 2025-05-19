@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,26 +21,35 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchTotali();
   }
 
-  Future<void> fetchTotali() async {
-    try {
-      final response = await http.get(
-        Uri.parse('http://API/getTotals.php?utente_id=1'), // Cambia con il tuo dominio/host locale
-      );
+Future<void> fetchTotali() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    int? userId = prefs.getInt('userId');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        setState(() {
-          entrate = double.tryParse(data['entrate'].toString()) ?? 0.0;
-          uscite = double.tryParse(data['uscite'].toString()) ?? 0.0;
-          isLoading = false;
-        });
-      } else {
-        print("Errore nella risposta: ${response.body}");
-      }
-    } catch (e) {
-      print("Errore nella connessione: $e");
+    if (userId == null) {
+      // Se non c'è userId, torna alla login o imposta uno di default
+      print("User ID non trovato!");
+      return;
     }
+
+    final response = await http.get(
+      Uri.parse('http://API/getTotals.php?utente_id=$userId'),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        entrate = double.tryParse(data['entrate'].toString()) ?? 0.0;
+        uscite = double.tryParse(data['uscite'].toString()) ?? 0.0;
+        isLoading = false;
+      });
+    } else {
+      print("Errore nella risposta: ${response.body}");
+    }
+  } catch (e) {
+    print("Errore nella connessione: $e");
   }
+}
 
   @override
   Widget build(BuildContext context) {

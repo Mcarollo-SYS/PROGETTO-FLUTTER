@@ -1,31 +1,50 @@
 <?php
-$host = 'localhost';
-$db = 'nome_db';
-$user = 'root';
-$pass = '';
+header('Content-Type: application/json');
 
-$conn = new mysqli($host, $user, $pass, $db);
+// Connessione al database
+$host = "localhost";
+$user = "tuo_utente";
+$password = "tua_password";
+$db = "nome_database";
 
+$conn = new mysqli($host, $user, $password, $db);
+
+// Controlla la connessione
 if ($conn->connect_error) {
-    die(json_encode(['error' => 'Connessione fallita']));
+    echo json_encode(["success" => false, "message" => "Connessione fallita: " . $conn->connect_error]);
+    exit;
 }
 
-$utente_id = intval($_GET['utente_id']); // esempio: /get_totals.php?utente_id=1
+// Verifica se l'ID utente è stato fornito
+if (!isset($_GET['utente_id'])) {
+    echo json_encode(["success" => false, "message" => "Parametro 'utente_id' mancante"]);
+    exit;
+}
 
-$response = [];
+$utente_id = intval($_GET['utente_id']);
 
-// Totale Entrate
-$sql_entrate = "SELECT SUM(importo) AS totale_entrate FROM transazioni WHERE tipo = 'Entrata' AND utente_id = $utente_id";
-$result_entrate = $conn->query($sql_entrate);
-$response['entrate'] = $result_entrate->fetch_assoc()['totale_entrate'] ?? 0.00;
+// Query per le entrate
+$sqlEntrate = "SELECT SUM(importo) as totale_entrate FROM transazioni WHERE utente_id = $utente_id AND tipo = 'entrata'";
+$resultEntrate = $conn->query($sqlEntrate);
+$entrate = 0.0;
+if ($resultEntrate && $row = $resultEntrate->fetch_assoc()) {
+    $entrate = floatval($row['totale_entrate']);
+}
 
-// Totale Uscite
-$sql_uscite = "SELECT SUM(importo) AS totale_uscite FROM transazioni WHERE tipo = 'Uscita' AND utente_id = $utente_id";
-$result_uscite = $conn->query($sql_uscite);
-$response['uscite'] = $result_uscite->fetch_assoc()['totale_uscite'] ?? 0.00;
+// Query per le uscite
+$sqlUscite = "SELECT SUM(importo) as totale_uscite FROM transazioni WHERE utente_id = $utente_id AND tipo = 'uscita'";
+$resultUscite = $conn->query($sqlUscite);
+$uscite = 0.0;
+if ($resultUscite && $row = $resultUscite->fetch_assoc()) {
+    $uscite = floatval($row['totale_uscite']);
+}
 
-header('Content-Type: application/json');
-echo json_encode($response);
+// Risposta JSON
+echo json_encode([
+    "success" => true,
+    "entrate" => $entrate,
+    "uscite" => $uscite
+]);
 
 $conn->close();
 ?>

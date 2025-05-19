@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class AddScreen extends StatefulWidget {
   const AddScreen({super.key});
@@ -10,6 +12,9 @@ class AddScreen extends StatefulWidget {
 
 class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _descController = TextEditingController();
+  final TextEditingController _amountController = TextEditingController();
+
   String? _selectedType;
   bool _showSuccessBanner = false;
   AnimationController? _animationController;
@@ -41,6 +46,8 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
   @override
   void dispose() {
     _animationController?.dispose();
+    _descController.dispose();
+    _amountController.dispose();
     super.dispose();
   }
 
@@ -60,6 +67,47 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
     });
   }
 
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg)),
+    );
+  }
+
+  Future<void> _saveTransaction() async {
+    final desc = _descController.text.trim();
+    final amount = _amountController.text.trim();
+    final type = _selectedType;
+
+    if (desc.isEmpty || amount.isEmpty || type == null) return;
+
+    final url = Uri.parse('https://tuo-dominio.com/addTransaction.php'); // Cambia con il tuo URL
+    final response = await http.post(
+      url,
+      body: {
+        'utente_id': '1', // Sostituisci con l'ID utente reale
+        'descrizione': desc,
+        'importo': amount,
+        'tipo': type,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['success'] == true) {
+        _showBanner();
+        _descController.clear();
+        _amountController.clear();
+        setState(() {
+          _selectedType = null;
+        });
+      } else {
+        _showError(data['message'] ?? 'Errore nel salvataggio');
+      }
+    } else {
+      _showError('Errore di rete');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,11 +115,7 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
       appBar: AppBar(
         title: const Text(
           'Aggiungi Transazione',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
-            color: Colors.black87,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20, color: Colors.black87),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -88,10 +132,11 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 20),
-                  _buildTextField(label: 'Descrizione'),
+                  _buildTextField(label: 'Descrizione', controller: _descController),
                   const SizedBox(height: 12),
                   _buildTextField(
                     label: 'Importo',
+                    controller: _amountController,
                     keyboardType: TextInputType.number,
                   ),
                   const SizedBox(height: 12),
@@ -119,28 +164,24 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
   Widget _buildTextField({
     required String label,
     TextInputType? keyboardType,
+    required TextEditingController controller,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 255, 255, 255),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE0E0E0)),
       ),
       child: TextFormField(
+        controller: controller,
         decoration: InputDecoration(
           labelText: label,
           border: InputBorder.none,
-          labelStyle: const TextStyle(
-            fontSize: 16,
-            color: Colors.black54,
-          ),
+          labelStyle: const TextStyle(fontSize: 16, color: Colors.black54),
         ),
         keyboardType: keyboardType,
-        style: const TextStyle(
-          fontSize: 16,
-          color: Colors.black87,
-        ),
+        style: const TextStyle(fontSize: 16, color: Colors.black87),
       ),
     );
   }
@@ -149,7 +190,7 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 255, 255, 255),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE0E0E0)),
       ),
@@ -157,17 +198,11 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
         children: const {
           'entrata': Padding(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            child: Text(
-              'Entrata',
-              style: TextStyle(fontSize: 16),
-            ),
+            child: Text('Entrata', style: TextStyle(fontSize: 16)),
           ),
           'uscita': Padding(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            child: Text(
-              'Uscita',
-              style: TextStyle(fontSize: 16),
-            ),
+            child: Text('Uscita', style: TextStyle(fontSize: 16)),
           ),
         },
         groupValue: _selectedType,
@@ -189,14 +224,13 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
       icon: const Icon(Icons.save, size: 20),
       label: const Text(
         'Salva',
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       ),
       onPressed: () {
         if (_formKey.currentState!.validate() && _selectedType != null) {
-          _showBanner();
+          _saveTransaction();
+        } else {
+          _showError("Completa tutti i campi.");
         }
       },
       style: ElevatedButton.styleFrom(

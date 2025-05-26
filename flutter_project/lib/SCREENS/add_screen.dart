@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_project/MODEL/transazione.dart';
+import 'package:flutter_project/add_api.dart';  // Importa AddApi
+import 'package:flutter_project/MODEL/transazione.dart';
 
 class AddScreen extends StatefulWidget {
   const AddScreen({super.key});
@@ -10,8 +13,15 @@ class AddScreen extends StatefulWidget {
 
 class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  String? _selectedType;
+  final AddApi apiService = AddApi();  // Istanza AddApi
+
+  TipoTransazione? _selectedType;
+  String? _descrizione;
+  String? _importo;
+
   bool _showSuccessBanner = false;
+  bool _isSubmitting = false;
+
   AnimationController? _animationController;
   Animation<double>? _fadeAnimation;
   Animation<Offset>? _slideAnimation;
@@ -60,6 +70,53 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
     });
   }
 
+  Future<void> _submitForm() async {
+    if (!_formKey.currentState!.validate() || _selectedType == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Per favore, compila tutti i campi e seleziona il tipo')),
+      );
+      return;
+    }
+
+    _formKey.currentState!.save();
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      final nuovaTransazione = Transazione(
+        id: 0,
+        descrizione: _descrizione!,
+        importo: double.parse(_importo!),
+        tipo: _selectedType!,
+        data: DateTime.now(),
+      );
+
+      final success = await apiService.aggiungiTransazione(nuovaTransazione);
+
+      if (success) {
+        _showBanner();
+        _formKey.currentState!.reset();
+        setState(() {
+          _selectedType = null;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Errore nel salvataggio della transazione')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore: $e')),
+      );
+    } finally {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,11 +145,22 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 20),
-                  _buildTextField(label: 'Descrizione'),
+                  _buildTextField(
+                    label: 'Descrizione',
+                    onSaved: (val) => _descrizione = val,
+                    validator: (val) => (val == null || val.isEmpty) ? 'Inserisci una descrizione' : null,
+                  ),
                   const SizedBox(height: 12),
                   _buildTextField(
                     label: 'Importo',
                     keyboardType: TextInputType.number,
+                    onSaved: (val) => _importo = val,
+                    validator: (val) {
+                      if (val == null || val.isEmpty) return 'Inserisci un importo';
+                      final n = double.tryParse(val);
+                      if (n == null || n <= 0) return 'Inserisci un importo valido > 0';
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 12),
                   _buildSegmentedControl(),
@@ -111,6 +179,13 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
               ),
             ),
           ),
+          if (_isSubmitting)
+            Container(
+              color: Colors.black38,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
         ],
       ),
     );
@@ -119,6 +194,8 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
   Widget _buildTextField({
     required String label,
     TextInputType? keyboardType,
+    String? Function(String?)? validator,
+    void Function(String?)? onSaved,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
@@ -141,6 +218,8 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
           fontSize: 16,
           color: Colors.black87,
         ),
+        validator: validator,
+        onSaved: onSaved,
       ),
     );
   }
@@ -187,18 +266,14 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
   Widget _buildSaveButton() {
     return ElevatedButton.icon(
       icon: const Icon(Icons.save, size: 20),
-      label: const Text(
-        'Salva',
-        style: TextStyle(
+      label: Text(
+        _isSubmitting ? 'Salvando...' : 'Salva',
+        style: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
       ),
-      onPressed: () {
-        if (_formKey.currentState!.validate() && _selectedType != null) {
-          _showBanner();
-        }
-      },
+      onPressed: _isSubmitting ? null : _submitForm,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,

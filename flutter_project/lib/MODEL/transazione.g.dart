@@ -8,7 +8,6 @@ part of 'transazione.dart';
 
 Transazione _$TransazioneFromJson(Map<String, dynamic> json) => Transazione(
   id: (json['id'] as num).toInt(),
-  categoriaId: (json['categoria_id'] as num).toInt(),
   importo: (json['importo'] as num).toDouble(),
   tipo: $enumDecode(_$TipoTransazioneEnumMap, json['tipo']),
   descrizione: json['descrizione'] as String?,
@@ -18,7 +17,6 @@ Transazione _$TransazioneFromJson(Map<String, dynamic> json) => Transazione(
 Map<String, dynamic> _$TransazioneToJson(Transazione instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'categoria_id': instance.categoriaId,
       'importo': instance.importo,
       'tipo': _$TipoTransazioneEnumMap[instance.tipo]!,
       'descrizione': instance.descrizione,

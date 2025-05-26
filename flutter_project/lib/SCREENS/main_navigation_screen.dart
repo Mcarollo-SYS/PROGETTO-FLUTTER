@@ -19,21 +19,18 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     HomeScreen(),
     StatsScreen(),
     AddScreen(),
-    ProfileScreen(),
   ];
 
   final List<IconData> _icons = [
     Icons.home,
     Icons.bar_chart,
     Icons.add_circle,
-    Icons.person,
   ];
 
   final List<String> _labels = [
     'Home',
     'Statistiche',
     'Aggiungi',
-    'Profilo'
   ];
 
 @override

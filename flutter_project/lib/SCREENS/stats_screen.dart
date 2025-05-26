@@ -1,7 +1,7 @@
-// lib/SCREENS/stats_screen.dart
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StatsScreen extends StatefulWidget {
   const StatsScreen({super.key});
@@ -15,23 +15,55 @@ class _StatsScreenState extends State<StatsScreen> {
   String total = "€ 0,00";
   String average = "€ 0,00";
   String count = "0";
+  String? _error;
 
   Future<void> fetchStats() async {
-    try {
-      final response = await http.get(
-        Uri.parse("http://localhost/API/stats.php"), // CAMBIA URL
-      );
+    // Passo 1: Ottieni user_id
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('user_id');
 
-      final data = jsonDecode(response.body);
+    // Passo 2: Verifica autenticazione
+    if (userId == null) {
       setState(() {
-        total = "€ ${data['total']}";
-        average = "€ ${data['average']}";
-        count = data['transactions'].toString();
+        _error = "Errore: Utente non autenticato.";
         _loading = false;
       });
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      return;
+    }
+
+    // Passo 3: Chiamata API con user_id
+    try {
+      final response = await http.get(
+        Uri.parse("http://localhost/API/stats.php?user_id=$userId"),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          setState(() {
+            total = "€ ${data['total']}";
+            average = "€ ${data['average']}";
+            count = data['transactions'].toString();
+            _loading = false;
+          });
+        } else {
+          setState(() {
+            _error = data['message'] ?? 'Errore sconosciuto';
+            _loading = false;
+          });
+        }
+      } else {
+        setState(() {
+          _error = 'Errore HTTP: ${response.statusCode}';
+          _loading = false;
+        });
+      }
     } catch (e) {
-      print("Errore: $e");
-      setState(() => _loading = false);
+      setState(() {
+        _error = 'Errore di rete: $e';
+        _loading = false;
+      });
     }
   }
 
@@ -43,6 +75,14 @@ class _StatsScreenState extends State<StatsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_error != null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Statistiche')),
+        body: Center(child: Text('Errore: $_error')),
+      );
+    }
+
+    // ... (il resto del metodo build rimane invariato)
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -104,9 +144,10 @@ class _StatsScreenState extends State<StatsScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: const TextStyle(fontSize: 16)),
-          Text(value,
-              style: const TextStyle(
-                  fontSize: 17, fontWeight: FontWeight.w600)),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+          ),
         ],
       ),
     );

@@ -1,8 +1,8 @@
 <?php
 $host = 'localhost';
-$dbname = 'NOME_DATABASE';
-$user = 'USERNAME';
-$pass = 'PASSWORD';
+$dbname = 'note_spese';
+$user = 'root';
+$pass = '';
 
 $conn = new mysqli($host, $user, $pass, $dbname);
 if ($conn->connect_error) {

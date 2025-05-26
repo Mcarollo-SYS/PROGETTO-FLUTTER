@@ -19,7 +19,7 @@ class _StatsScreenState extends State<StatsScreen> {
   Future<void> fetchStats() async {
     try {
       final response = await http.get(
-        Uri.parse("https://tuosito.it/stats.php"), // CAMBIA URL
+        Uri.parse("http://localhost/API/stats.php"), // CAMBIA URL
       );
 
       final data = jsonDecode(response.body);

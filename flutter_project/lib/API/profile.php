@@ -1,5 +1,11 @@
 <?php
+// Header CORS
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
+
+
 require 'db.php';
 
 $user_id = intval($_GET['user_id'] ?? 0);

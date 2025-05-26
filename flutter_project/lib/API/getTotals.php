@@ -1,11 +1,16 @@
 <?php
-header('Content-Type: application/json');
+// Header CORS
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Content-Type: application/json");
+
 
 // Connessione al database
 $host = "localhost";
-$user = "tuo_utente";
-$password = "tua_password";
-$db = "nome_database";
+$user = "root";
+$password = "";
+$db = "note_spese";
 
 $conn = new mysqli($host, $user, $password, $db);
 

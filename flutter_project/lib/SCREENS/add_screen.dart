@@ -80,7 +80,7 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
 
     if (desc.isEmpty || amount.isEmpty || type == null) return;
 
-    final url = Uri.parse('https://tuo-dominio.com/addTransaction.php'); // Cambia con il tuo URL
+final url = Uri.parse('http://localhost/htdocs/API/adTransaction.php');
     final response = await http.post(
       url,
       body: {

@@ -1,8 +1,14 @@
 <?php
+// Header CORS
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
 
+
+
 // Connessione al DB
-$conn = new mysqli("localhost", "USERNAME", "PASSWORD", "NOME_DATABASE");
+$conn = new mysqli("localhost", "root", "", "note_spese");
 
 if ($conn->connect_error) {
     http_response_code(500); // Errore interno server

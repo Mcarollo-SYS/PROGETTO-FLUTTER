@@ -42,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   try {
     final response = await http.post(
-      Uri.parse('https://tuosito.it/login.php'),
+      Uri.parse('http://localhost/API/login.php'),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({"email": email, "password": password}),
     );

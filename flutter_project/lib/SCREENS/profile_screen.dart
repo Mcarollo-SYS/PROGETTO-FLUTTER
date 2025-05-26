@@ -36,7 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   }
 
   Future<void> _fetchUserData() async {
-    final url = Uri.parse('https://tuo-server.it/get_profile.php?user_id=${widget.userId}');
+final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.userId}');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {

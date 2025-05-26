@@ -33,7 +33,7 @@ Future<void> fetchTotali() async {
     }
 
     final response = await http.get(
-      Uri.parse('http://API/getTotals.php?utente_id=$userId'),
+      Uri.parse('http://localhost/htdocs/API/getTotals.php?utente_id=$userId')
     );
 
     if (response.statusCode == 200) {

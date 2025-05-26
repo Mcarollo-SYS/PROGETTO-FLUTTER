@@ -88,63 +88,6 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-
-            // 👋 Testo di benvenuto
-            const Text(
-              'Benvenuto 👋',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Controlla e gestisci le tue spese facilmente.',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black54,
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            // Card Totale Spese
-            _infoCard(title: 'Totale Spese', value: '€ 1.240,00'),
-            const SizedBox(height: 16),
-
-            // Card Spese Mese
-            _infoCard(title: 'Spese Mese', value: '€ 310,00'),
-
-            const Spacer(),
-
-            // Bottone Aggiungi
-            Center(
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // TODO: naviga ad aggiungi spesa
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.black87,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 1,
-                  ),
-                  child: const Text(
-                    'Aggiungi Spesa',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),

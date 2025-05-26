@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ProfileScreen extends StatefulWidget {
-  final int userId; // ID utente passato al profilo
+  final int userId; // ID utente passato alla schermata Profilo
 
   const ProfileScreen({super.key, required this.userId});
 
@@ -15,14 +15,15 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   late AnimationController _animationController;
   late Animation<double> _avatarScaleAnimation;
 
-  bool _loading = true;
-  String? _error;
-  Map<String, dynamic>? _userData;
+  bool _loading = true;               // Stato di caricamento dati
+  String? _error;                    // Messaggio di errore, se presente
+  Map<String, dynamic>? _userData;  // Dati utente ricevuti dal backend
 
   @override
   void initState() {
     super.initState();
 
+    // Setup animazione per ingrandire l'avatar all'apertura
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -32,33 +33,39 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     );
     _animationController.forward();
 
+    // Avvia la chiamata per caricare i dati dell'utente
     _fetchUserData();
   }
 
+  // Metodo che fa la richiesta HTTP per ottenere i dati del profilo
   Future<void> _fetchUserData() async {
-final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.userId}');
+    final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.userId}');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['success'] == true) {
+          // Se la risposta è positiva, aggiorna i dati e stato caricamento
           setState(() {
             _userData = data['user'];
             _loading = false;
           });
         } else {
+          // Se risposta negativa, mostra messaggio di errore dal backend
           setState(() {
             _error = data['message'] ?? 'Errore sconosciuto';
             _loading = false;
           });
         }
       } else {
+        // Se codice HTTP non è 200, segnala errore HTTP
         setState(() {
           _error = 'Errore HTTP: ${response.statusCode}';
           _loading = false;
         });
       }
     } catch (e) {
+      // Gestione errori di rete o di parsing JSON
       setState(() {
         _error = 'Errore di rete: $e';
         _loading = false;
@@ -68,10 +75,11 @@ final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.use
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _animationController.dispose(); // Pulisce controller animazione
     super.dispose();
   }
 
+  // Dialog per confermare il logout
   void _showLogoutDialog() {
     showDialog(
       context: context,
@@ -83,7 +91,9 @@ final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.use
           TextButton(
             onPressed: () {
               Navigator.pop(context);
+              // Esempio base: ritorna alla pagina login e rimuove la cronologia navigazione
               Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+              // Suggerimento: qui sarebbe bene anche pulire lo SharedPreferences (user_id)
             },
             child: const Text('Esci'),
           ),
@@ -94,12 +104,14 @@ final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.use
 
   @override
   Widget build(BuildContext context) {
+    // Mostra caricamento se i dati non sono ancora pronti
     if (_loading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
+    // Mostra errore se presente
     if (_error != null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Profilo')),
@@ -107,9 +119,9 @@ final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.use
       );
     }
 
-    // Se siamo qui, _userData è valorizzato
-    final nome = _userData!['nome'] ?? '';
-    final email = _userData!['email'] ?? '';
+    // Se i dati sono caricati, estrai i campi utente con sicurezza null-safe
+    final nome = _userData!['nome']?.toString() ?? '';
+    final email = _userData!['email']?.toString() ?? '';
     final telefono = _userData!['telefono']?.toString() ?? '';
 
     return Scaffold(
@@ -133,6 +145,8 @@ final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.use
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 20),
+
+                // Avatar con animazione di scala
                 ScaleTransition(
                   scale: _avatarScaleAnimation,
                   child: Column(
@@ -147,13 +161,17 @@ final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.use
                         child: const CircleAvatar(
                           radius: 60,
                           backgroundColor: Colors.grey,
+                          // Qui potresti caricare un'immagine da rete se disponibile
                         ),
                       ),
                       const SizedBox(height: 12),
+
+                      // Nome utente
                       Text(
                         nome,
                         style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.black87),
                       ),
+                      // Email utente
                       Text(
                         email,
                         style: const TextStyle(fontSize: 16, color: Colors.black54),
@@ -161,7 +179,10 @@ final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.use
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 20),
+
+                // Box con informazioni personali
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -174,17 +195,29 @@ final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.use
                     children: [
                       const Text('Informazioni Personali', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
                       const SizedBox(height: 12),
+
+                      // Riga info nome
                       _buildInfoRow(icon: Icons.person, label: 'Nome', value: nome),
                       const SizedBox(height: 12),
+
+                      // Riga info email
                       _buildInfoRow(icon: Icons.email, label: 'Email', value: email),
                       const SizedBox(height: 12),
+
+                      // Riga info telefono
                       _buildInfoRow(icon: Icons.phone, label: 'Telefono', value: telefono),
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 20),
+
+                // Sezione impostazioni fittizie
                 _buildSettingsSection(),
+
                 const SizedBox(height: 30),
+
+                // Bottone logout
                 _buildLogoutButton(),
               ],
             ),
@@ -194,6 +227,7 @@ final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.use
     );
   }
 
+  // Widget per riga di info con icona, etichetta e valore allineato a destra
   Widget _buildInfoRow({required IconData icon, required String label, required String value}) {
     return Row(
       children: [
@@ -208,6 +242,7 @@ final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.use
     );
   }
 
+  // Sezione impostazioni con voce modificabili (per ora solo snack bar)
   Widget _buildSettingsSection() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -221,18 +256,21 @@ final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.use
         children: [
           const Text('Impostazioni', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
           const SizedBox(height: 12),
+
           _buildSettingItem(
             icon: Icons.edit,
             label: 'Modifica Profilo',
             onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Funzionalità in arrivo!'))),
           ),
           const SizedBox(height: 12),
+
           _buildSettingItem(
             icon: Icons.notifications,
             label: 'Notifiche',
             onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Funzionalità in arrivo!'))),
           ),
           const SizedBox(height: 12),
+
           _buildSettingItem(
             icon: Icons.lock,
             label: 'Privacy',
@@ -243,6 +281,7 @@ final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.use
     );
   }
 
+  // Singolo elemento impostazione
   Widget _buildSettingItem({required IconData icon, required String label, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
@@ -258,6 +297,7 @@ final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.use
     );
   }
 
+  // Bottone logout rosso
   Widget _buildLogoutButton() {
     return ElevatedButton(
       onPressed: _showLogoutDialog,

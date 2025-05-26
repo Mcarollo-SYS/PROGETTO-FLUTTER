@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'main_navigation_screen.dart';
 
+// Schermata di login utente con email e password
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -12,10 +13,11 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  bool _loading = false;
+  final TextEditingController _emailController = TextEditingController();    // Controller per campo email
+  final TextEditingController _passwordController = TextEditingController(); // Controller per campo password
+  bool _loading = false; // Stato per indicare se è in corso il login
 
+  // Funzione per mostrare messaggi personalizzati in SnackBar
   void _showCustomSnackBar(String message, {Color color = Colors.red}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -29,57 +31,65 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
- Future<void> _login() async {
-  final email = _emailController.text.trim();
-  final password = _passwordController.text;
+  // Funzione asincrona per effettuare il login tramite API
+  Future<void> _login() async {
+    final email = _emailController.text.trim();      // Prende email e rimuove spazi
+    final password = _passwordController.text;        // Prende password
 
-  if (email.isEmpty || password.isEmpty) {
-    _showCustomSnackBar("Inserisci email e password");
-    return;
-  }
-
-  setState(() => _loading = true);
-
-  try {
-    final response = await http.post(
-      Uri.parse('http://localhost/API/login.php'),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"email": email, "password": password}),
-    );
-
-    final data = jsonDecode(response.body);
-    if (data["success"]) {
-      final userId = data["user"]["id"];
-      
-      // Salva l'userId in locale
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('user_id', userId);
-
-      _showCustomSnackBar("Accesso riuscito", color: Colors.green);
-
-      // Passa l'ID utente alla schermata principale
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
-      );
-    } else {
-      _showCustomSnackBar(data["message"]);
+    // Controlla che email e password non siano vuoti
+    if (email.isEmpty || password.isEmpty) {
+      _showCustomSnackBar("Inserisci email e password");
+      return;
     }
-  } catch (e) {
-    _showCustomSnackBar("Errore di connessione al server");
-  } finally {
-    setState(() => _loading = false);
+
+    setState(() => _loading = true);  // Imposta caricamento a true per bloccare pulsante e mostra spinner
+
+    try {
+      // Effettua richiesta POST all'API con email e password in JSON
+      final response = await http.post(
+        Uri.parse('http://localhost/API/login.php'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"email": email, "password": password}),
+      );
+
+      final data = jsonDecode(response.body); // Decodifica risposta JSON
+
+      if (data["success"]) {
+        final userId = data["user"]["id"];  // Recupera l'ID utente dalla risposta
+
+        // Salva userId nelle SharedPreferences locali per sessioni future
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setInt('user_id', userId);
+
+        _showCustomSnackBar("Accesso riuscito", color: Colors.green); // Mostra messaggio di successo
+
+        // Naviga alla schermata principale sostituendo la schermata attuale
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+        );
+      } else {
+        // Se login non ha successo, mostra messaggio di errore proveniente dall'API
+        _showCustomSnackBar(data["message"]);
+      }
+    } catch (e) {
+      // In caso di errori di rete o altro mostra messaggio generico
+      _showCustomSnackBar("Errore di connessione al server");
+    } finally {
+      setState(() => _loading = false);  // Ferma animazione caricamento
+    }
   }
-}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
+      appBar: AppBar(title: const Text("Login")),  // Barra in alto con titolo
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,  // Centra i widget verticalmente
           children: [
+            // Campo di testo per email con icona
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
@@ -89,6 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             const SizedBox(height: 16),
+            // Campo di testo per password, testo nascosto
             TextField(
               controller: _passwordController,
               obscureText: true,
@@ -99,6 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             const SizedBox(height: 24),
+            // Bottone per inviare login, disabilitato se è in caricamento
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -117,8 +129,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: Colors.white,
                           strokeWidth: 2,
                         ),
-                      )
-                    : const Text("Login", style: TextStyle(fontSize: 16)),
+                      )  // Mostra spinner se in caricamento
+                    : const Text("Login", style: TextStyle(fontSize: 16)),  // Testo bottone
               ),
             ),
           ],

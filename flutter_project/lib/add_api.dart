@@ -21,6 +21,7 @@ class AddApi {
       return jsonData['success'] == true;
     } else {
       throw Exception('Errore nell\'inserimento transazione');
+      //codici errore es:server
     }
   }
 }

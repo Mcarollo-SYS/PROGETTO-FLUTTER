@@ -97,6 +97,7 @@ switch ($method) {
         if ($importo !== '' && ($tipo === 'entrata' || $tipo === 'uscita')) {
             $sql = "INSERT INTO transazioni (importo, tipo, descrizione, data) VALUES ('$importo', '$tipo', '$descrizione', '$data_transazione')";
             if ($conn->query($sql)) {
+                http_response_code(200);
                 echo json_encode(['success' => true, 'id' => $conn->insert_id]);
             } else {
                 http_response_code(500);

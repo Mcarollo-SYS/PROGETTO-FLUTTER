@@ -39,7 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
   // Metodo che fa la richiesta HTTP per ottenere i dati del profilo
   Future<void> _fetchUserData() async {
-    final url = Uri.parse('http://localhost/API/get_profile.php?user_id=${widget.userId}');
+    final url = Uri.parse('http://localhost/htdocs/API/get_profile.php?user_id=${widget.userId}');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
@@ -58,7 +58,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           });
         }
       } else {
-        // Se codice HTTP non è 200, segnala errore HTTP
         setState(() {
           _error = 'Errore HTTP: ${response.statusCode}';
           _loading = false;
@@ -91,9 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // Esempio base: ritorna alla pagina login e rimuove la cronologia navigazione
               Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-              // Suggerimento: qui sarebbe bene anche pulire lo SharedPreferences (user_id)
             },
             child: const Text('Esci'),
           ),
@@ -111,7 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       );
     }
 
-    // Mostra errore se presente
+    // Mostra errore se ce un errore 
     if (_error != null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Profilo')),
@@ -161,7 +158,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                         child: const CircleAvatar(
                           radius: 60,
                           backgroundColor: Colors.grey,
-                          // Qui potresti caricare un'immagine da rete se disponibile
                         ),
                       ),
                       const SizedBox(height: 12),

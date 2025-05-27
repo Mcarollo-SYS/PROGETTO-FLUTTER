@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       // Effettua richiesta POST all'API con email e password in JSON
       final response = await http.post(
-        Uri.parse('http://localhost/API/login.php'),
+        Uri.parse('http://localhost/htdocs/API/login.php'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"email": email, "password": password}),
       );

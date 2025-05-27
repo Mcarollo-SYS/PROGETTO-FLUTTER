@@ -26,10 +26,9 @@ class _StatsScreenState extends State<StatsScreen> {
     });
 
     final prefs = await SharedPreferences.getInstance();
-    // Assicurati che la chiave sia 'user_id' come salvata durante il login
     final userId = prefs.getInt('user_id');
 
-    if (!mounted) return; // Verifica se il widget è ancora montato
+    if (!mounted) return; 
 
     if (userId == null) {
       setState(() {
@@ -41,11 +40,7 @@ class _StatsScreenState extends State<StatsScreen> {
       return;
     }
 
-    // SOSTITUISCI CON IL TUO IP E PERCORSO CORRETTO
-    // Esempio per emulatore Android: "http://10.0.2.2/PROGETTO-FLUTTER/flutter_project/lib/API/stats.php?user_id=$userId"
-    // Esempio per iOS e dispositivo fisico (usa l'IP della tua macchina sulla rete locale):
-    // "http://192.168.1.XXX/PROGETTO-FLUTTER/flutter_project/lib/API/stats.php?user_id=$userId"
-    final String apiUrl = "http://10.0.2.2/PROGETTO-FLUTTER/flutter_project/lib/API/stats.php?user_id=$userId";
+    final String apiUrl = "http://localhost/htdocs/API/stats.php?user_id=$userId";
 
     try {
       final response = await http.get(
@@ -59,8 +54,6 @@ class _StatsScreenState extends State<StatsScreen> {
 
         if (data['success'] == true) {
           setState(() {
-            // I nomi dei campi 'total', 'average', 'transactions' devono corrispondere
-            // a quelli restituiti dallo script PHP corretto.
             _totalExpenses = "€ ${data['total'] ?? '0,00'}";
             _averageExpenses = "€ ${data['average'] ?? '0,00'}";
             _numberOfExpenseTransactions = (data['transactions'] ?? 0).toString();

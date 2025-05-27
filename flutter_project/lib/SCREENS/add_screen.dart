@@ -110,7 +110,7 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
     // Formatta la data come YYYY-MM-DD
     final String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate!);
 
-    final url = Uri.parse('http://TUO_INDIRIZZO_IP_O_10.0.2.2/PERCORSO_ALLA_CARTELLA_API/adTransaction.php');
+    final url = Uri.parse('http://localhost/htdocs/API/adTransaction.php');
 
     try {
         final response = await http.post(
@@ -120,19 +120,18 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
             'descrizione': desc,
             'importo': amount,
             'tipo': type,
-            'categoria': category, // NUOVO: Invia categoria
-            'data': formattedDate, // NUOVO: Invia data formattata
+            'categoria': category, 
+            'data': formattedDate, 
         },
         );
 
-        // Il tuo script PHP restituisce 201 on success, non 200
-        if (response.statusCode == 201) { // Modificato da 200 a 201
+        if (response.statusCode == 201) { 
         final data = json.decode(response.body);
         if (data['success'] == true) {
             _showBanner();
             _descController.clear();
             _amountController.clear();
-            _categoryController.clear(); // NUOVO: Pulisci campo categoria
+            _categoryController.clear(); 
             setState(() {
             _selectedType = null;
             _selectedDate = DateTime.now(); // Resetta la data a oggi
@@ -151,7 +150,6 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // ... (AppBar non modificata)
       appBar: AppBar(
         title: const Text(
           'Aggiungi Transazione',
@@ -181,7 +179,7 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
                       keyboardType: TextInputType.numberWithOptions(decimal: true), // Permetti decimali
                     ),
                     const SizedBox(height: 12),
-                    _buildTextField(label: 'Categoria', controller: _categoryController), // NUOVO: Campo Categoria
+                    _buildTextField(label: 'Categoria', controller: _categoryController), 
                     const SizedBox(height: 12),
                     // NUOVO: Selettore Data
                     Container(
@@ -225,11 +223,8 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
     );
   }
   
-  // _buildTextField, _buildSegmentedControl, _buildSaveButton, _buildSuccessBanner
-  // rimangono sostanzialmente invariati, assicurati solo che _buildTextField sia generico
-  // e possa essere usato per il campo categoria.
 
-  Widget _buildTextField({ // Non modificato
+  Widget _buildTextField({ 
     required String label,
     TextInputType? keyboardType,
     required TextEditingController controller,
@@ -254,7 +249,7 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
     );
   }
 
-  Widget _buildSegmentedControl() { // Non modificato
+  Widget _buildSegmentedControl() { 
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -287,7 +282,7 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
     );
   }
 
-  Widget _buildSaveButton() { // Non modificato
+  Widget _buildSaveButton() {
     return ElevatedButton.icon(
       icon: const Icon(Icons.save, size: 20),
       label: const Text(
@@ -312,7 +307,7 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
     );
   }
 
-  Widget _buildSuccessBanner() { // Non modificato
+  Widget _buildSuccessBanner() { 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
       decoration: BoxDecoration(

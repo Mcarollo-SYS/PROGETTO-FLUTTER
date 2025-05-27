@@ -17,7 +17,8 @@ CREATE TABLE transazioni (
     descrizione VARCHAR(255) NOT NULL,
     importo DECIMAL(10,2) NOT NULL,
     tipo ENUM('entrata', 'uscita') NOT NULL,
-    data DATE NOT NULL DEFAULT CURRENT_DATE,
+    categoria VARCHAR(100), -- NUOVO CAMPO CATEGORIA (rendilo NOT NULL se obbligatorio)
+    data DATE NOT NULL DEFAULT CURRENT_DATE, -- Campo data già presente
 
     FOREIGN KEY (utente_id) REFERENCES utenti(id) ON DELETE CASCADE
 );

@@ -249,11 +249,14 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
             ),
           ),
         },
-        groupValue: _selectedType,
+        groupValue: _selectedType?.name,
         onValueChanged: (String value) {
-          setState(() {
-            _selectedType = value;
-          });
+          onValueChanged: (String value) {
+        setState(() {
+         _selectedType = TipoTransazione.values.firstWhere((e) => e.name == value);
+         });
+      };
+
         },
         borderColor: Colors.transparent,
         selectedColor: const Color.fromARGB(255, 96, 96, 96),

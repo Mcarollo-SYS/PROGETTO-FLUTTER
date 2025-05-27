@@ -1,8 +1,39 @@
-// lib/SCREENS/stats_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_project/statistiche_api.dart';
 
-class StatsScreen extends StatelessWidget {
+class StatsScreen extends StatefulWidget {
   const StatsScreen({super.key});
+
+  @override
+  _StatsScreenState createState() => _StatsScreenState();
+}
+
+class _StatsScreenState extends State<StatsScreen> {
+  double _totaleUscite = 0.0;
+  double _mediaMensile = 0.0;
+  int _numeroTransazioni = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStats();
+  }
+
+  Future<void> _loadStats() async {
+    final api = StatisticheApi();
+    try {
+      final totaleUscite = await api.getTotaleUscite();
+      final mediaMensile = await api.getMediaMensile();
+      final numeroTransazioni = await api.getNumeroTransazioni();
+      setState(() {
+        _totaleUscite = totaleUscite;
+        _mediaMensile = mediaMensile;
+        _numeroTransazioni = numeroTransazioni;
+      });
+    } catch (e) {
+      print('Errore nel recupero delle statistiche: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +59,6 @@ class StatsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 20),
-
-            // Titolo sezione
             const Text(
               'Spese mensili',
               style: TextStyle(
@@ -39,8 +68,6 @@ class StatsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-
-            // Placeholder per grafico
             Container(
               height: 200,
               decoration: BoxDecoration(
@@ -58,19 +85,22 @@ class StatsScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 30),
-
-            // Statistiche generiche
-            _statTile(title: 'Spesa Totale', value: '€ 1.240,00'),
+            _statTile(
+              title: 'Spesa Totale',
+              value: '€ ${_totaleUscite.toStringAsFixed(2)}',
+            ),
             const SizedBox(height: 12),
-            _statTile(title: 'Media Mensile', value: '€ 310,00'),
+            _statTile(
+              title: 'Media Mensile',
+              value: '€ ${_mediaMensile.toStringAsFixed(2)}',
+            ),
             const SizedBox(height: 12),
-            _statTile(title: 'Numero Transazioni', value: '12'),
-
+            _statTile(
+              title: 'Numero Transazioni',
+              value: '$_numeroTransazioni',
+            ),
             const Spacer(),
-
-            // Messaggio finale
             const Center(
               child: Text(
                 'Più dati arriveranno presto!',
@@ -83,7 +113,6 @@ class StatsScreen extends StatelessWidget {
     );
   }
 
-  // Widget per singola riga di statistica
   Widget _statTile({required String title, required String value}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -95,8 +124,10 @@ class StatsScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title,
-              style: const TextStyle(fontSize: 16, color: Colors.black87)),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 16, color: Colors.black87),
+          ),
           Text(
             value,
             style: const TextStyle(

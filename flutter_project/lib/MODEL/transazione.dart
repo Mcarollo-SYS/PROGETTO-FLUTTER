@@ -2,21 +2,20 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'transazione.g.dart'; // ✅ corretto
 
-enum TipoTransazione { Entrata, Uscita }
 
 @JsonSerializable()
 class Transazione {
   final int id;
   final double importo;
-  final TipoTransazione tipo;
-  final String? descrizione;
+  final String tipo;
+  final String descrizione;
   final DateTime data;
 
   Transazione({
     required this.id,
     required this.importo,
     required this.tipo,
-    this.descrizione,
+    required this.descrizione,
     required this.data,
   });
 

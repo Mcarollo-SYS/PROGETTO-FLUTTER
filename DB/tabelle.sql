@@ -20,5 +20,5 @@ CREATE TABLE transazioni (
     importo DECIMAL(10,2) NOT NULL,
     tipo ENUM('entrata', 'uscita') NOT NULL,
     descrizione TEXT,
-    data DATE NOT NULL,
+    data DATE NOT NULL
 );

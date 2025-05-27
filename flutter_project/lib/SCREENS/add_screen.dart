@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_project/MODEL/transazione.dart';
-import 'package:flutter_project/add_api.dart';  // Importa AddApi
-import 'package:flutter_project/MODEL/transazione.dart';
+import 'package:flutter_project/add_api.dart';
 
 class AddScreen extends StatefulWidget {
   const AddScreen({super.key});
@@ -13,11 +12,12 @@ class AddScreen extends StatefulWidget {
 
 class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  final AddApi apiService = AddApi();  // Istanza AddApi
+  final AddApi apiService = AddApi();
 
-  TipoTransazione? _selectedType;
+  String? _selectedType;
   String? _descrizione;
   String? _importo;
+  DateTime? _selectedDate;
 
   bool _showSuccessBanner = false;
   bool _isSubmitting = false;
@@ -71,9 +71,9 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
   }
 
   Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate() || _selectedType == null) {
+    if (!_formKey.currentState!.validate() || _selectedType == null || _selectedDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Per favore, compila tutti i campi e seleziona il tipo')),
+        const SnackBar(content: Text('Per favore, compila tutti i campi, seleziona il tipo e la data')),
       );
       return;
     }
@@ -90,7 +90,7 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
         descrizione: _descrizione!,
         importo: double.parse(_importo!),
         tipo: _selectedType!,
-        data: DateTime.now(),
+        data: _selectedDate!,
       );
 
       final success = await apiService.aggiungiTransazione(nuovaTransazione);
@@ -100,6 +100,7 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
         _formKey.currentState!.reset();
         setState(() {
           _selectedType = null;
+          _selectedDate = null;
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -164,6 +165,8 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
                   ),
                   const SizedBox(height: 12),
                   _buildSegmentedControl(),
+                  const SizedBox(height: 12),
+                  _buildDatePicker(),
                   const SizedBox(height: 30),
                   _buildSaveButton(),
                   const SizedBox(height: 12),
@@ -200,7 +203,7 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 255, 255, 255),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE0E0E0)),
       ),
@@ -225,43 +228,99 @@ class _AddScreenState extends State<AddScreen> with SingleTickerProviderStateMix
   }
 
   Widget _buildSegmentedControl() {
+    final Map<String, Widget> tipoLabels = {
+      'entrata': const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: Text('Entrata', style: TextStyle(fontSize: 16)),
+      ),
+      'uscita': const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: Text('Uscita', style: TextStyle(fontSize: 16)),
+      ),
+    };
+
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 255, 255, 255),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE0E0E0)),
       ),
       child: CupertinoSegmentedControl<String>(
-        children: const {
-          'entrata': Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            child: Text(
-              'Entrata',
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
-          'uscita': Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            child: Text(
-              'Uscita',
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
-        },
-        groupValue: _selectedType?.name,
+        children: tipoLabels,
+        groupValue: _selectedType,
         onValueChanged: (String value) {
-          onValueChanged: (String value) {
-        setState(() {
-         _selectedType = TipoTransazione.values.firstWhere((e) => e.name == value);
-         });
-      };
-
+          setState(() {
+            _selectedType = value;
+          });
         },
         borderColor: Colors.transparent,
         selectedColor: const Color.fromARGB(255, 96, 96, 96),
         unselectedColor: const Color(0xFFF7F8FA),
         pressedColor: Colors.grey[300],
+      ),
+    );
+  }
+
+  Widget _buildDatePicker() {
+    return GestureDetector(
+      onTap: () async {
+        DateTime now = DateTime.now();
+
+        final DateTime? pickedDate = await showDatePicker(
+          context: context,
+          initialDate: _selectedDate ?? now,
+          firstDate: DateTime(2000),
+          lastDate: DateTime(2100),
+        );
+
+        if (pickedDate != null) {
+          final TimeOfDay? pickedTime = await showTimePicker(
+            context: context,
+            initialTime: TimeOfDay.fromDateTime(_selectedDate ?? now),
+          );
+
+          if (pickedTime != null) {
+            final fullDateTime = DateTime(
+              pickedDate.year,
+              pickedDate.month,
+              pickedDate.day,
+              pickedTime.hour,
+              pickedTime.minute,
+            );
+
+            setState(() {
+              _selectedDate = fullDateTime;
+            });
+          }
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE0E0E0)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              _selectedDate != null
+                  ? 'Data: ${_selectedDate!.day.toString().padLeft(2, '0')}/'
+                    '${_selectedDate!.month.toString().padLeft(2, '0')}/'
+                    '${_selectedDate!.year} '
+                    'Ore: ${_selectedDate!.hour.toString().padLeft(2, '0')}:'
+                    '${_selectedDate!.minute.toString().padLeft(2, '0')}'
+                  : 'Seleziona data e ora',
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
+              ),
+            ),
+            const Icon(Icons.calendar_today, size: 20, color: Colors.black54),
+          ],
+        ),
       ),
     );
   }

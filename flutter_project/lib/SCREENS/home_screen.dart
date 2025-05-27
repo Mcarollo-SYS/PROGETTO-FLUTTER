@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/transazioni_api.dart';
-import 'package:flutter_project/transazioni_api.dart'; // importa il servizio
+import 'package:flutter_project/MODEL/transazione.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,6 +14,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   double entrate = 0;
   double uscite = 0;
+  List<Transazione> transazioni = [];
   bool isLoading = true;
   String? errorMessage;
 
@@ -27,10 +28,12 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final totEntrate = await apiService.getTotEntrate();
       final totUscite = await apiService.getTotUscite();
+      final listaTransazioni = await apiService.getTransazioni();
 
       setState(() {
         entrate = totEntrate;
         uscite = totUscite;
+        transazioni = listaTransazioni;
         isLoading = false;
       });
     } catch (e) {
@@ -68,6 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Riepilogo entrate/uscite
                       Container(
                         padding: const EdgeInsets.all(16),
                         margin: const EdgeInsets.only(bottom: 24),
@@ -128,7 +132,47 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                       ),
-                      // Qui puoi aggiungere altri widget
+                      // Titolo sezione transazioni
+                      const Text(
+                        'Transazioni recenti',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Lista transazioni
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: transazioni.length,
+                          itemBuilder: (context, index) {
+                            final transazione = transazioni[index];
+                            return Card(
+                              margin: const EdgeInsets.symmetric(vertical: 6),
+                              child: ListTile(
+                                leading: Icon(
+                                  transazione.tipo == 'entrata'
+                                      ? Icons.arrow_downward
+                                      : Icons.arrow_upward,
+                                  color: transazione.tipo == 'entrata'
+                                      ? Colors.green
+                                      : Colors.redAccent,
+                                ),
+                                title: Text(transazione.descrizione),
+                                subtitle: Text(
+                                  'Tipo: ${transazione.tipo} • Data: ${transazione.data}',
+                                ),
+                                trailing: Text(
+                                  '€ ${transazione.importo.toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ],
                   ),
       ),

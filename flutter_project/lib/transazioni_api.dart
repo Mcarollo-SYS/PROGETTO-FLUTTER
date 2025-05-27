@@ -27,7 +27,7 @@ class TransazioniApi {
     }
   }
 
-  Future<List<Transazione>> getTransazion() async {
+  Future<List<Transazione>> getTransazioni() async {
     final response = await http.get(Uri.parse(baseUrl));
 
     if (response.statusCode == 200) {

@@ -22,16 +22,4 @@ NoteSpese è un'applicazione mobile full-stack per la gestione e l'analisi della
 * 🔍 **Filtri Avanzati:** Filtraggio dinamico per intervallo di date, categoria e tipo di transazione[cite: 3].
 * 🔄 **Sincronizzazione Cloud:** Comunicazione client-server per la persistenza e il supporto multiutenza[cite: 3].
 
----
 
-## 🏗️ Struttura del Progetto
-
-```text
-PROGETTO-FLUTTER/
-├── lib/
-│   ├── models/        # Modelli dati (User, Transaction, Category)
-│   ├── providers/     # Logica di stato e gestione API (Provider)
-│   ├── screens/       # Interfacce utente (Dashboard, Login, Charts)
-│   └── widgets/       # Componenti UI riutilizzabili
-├── backend_php/       # Endpoint API RESTful e script SQL per MySQL
-└── pubspec.yaml       # Dipendenze del progetto
